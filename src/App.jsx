@@ -1,34 +1,56 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
-import './App.css'
+import './App.css';
 
 function App() {
-  const [name, setName] = useState("")
-  const [userName, setUserName] = useState("")
-  const [password, setPassword] = useState("")
-  const [specializzazione, setSpecializzazione] = useState("")
-  const [year, setYear] = useState("")
-  const [description, setDescription] = useState("")
-  const [error, setError] = useState("")
+  const [name, setName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [specializzazione, setSpecializzazione] = useState("");
+  const [year, setYear] = useState("");
+  const [description, setDescription] = useState("");
+  const [userNameError, setUserNameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
 
-  function handleSubmit(e){
+  // Funzioni di validazione
+  function validateUsername(username) {
+    const regex = /^[a-zA-Z0-9]{6,}$/;
+    return regex.test(username);
+  }
+
+  function validatePassword(password) {
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    return regex.test(password);
+  }
+
+  function validateDescription(description) {
+    const trimmed = description.trim();
+    return trimmed.length >= 20 && trimmed.length <= 1000;
+  }
+
+  // Gestione dei cambiamenti e validazioni in tempo reale
+  const handleUserNameChange = (e) => {
+    const value = e.target.value;
+    setUserName(value);
+    setUserNameError(validateUsername(value) ? "" : "Username deve essere alfanumerico e di almeno 6 caratteri");
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordError(validatePassword(value) ? "" : "Password deve essere lunga almeno 8 caratteri e contenere una lettera, un numero e un simbolo");
+  };
+
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setDescription(value);
+    setDescriptionError(validateDescription(value) ? "" : "Descrizione deve essere lunga tra 100 e 1000 caratteri");
+  };
+
+  function handleSubmit(e) {
     e.preventDefault();
-    setError("");
-
-    // Validazione dei campi
-    if (!name || !userName || !password || !specializzazione || !year || !description) {
-      setError("Tutti i campi sono obbligatori!");
-      return;
-    }
-
-    // Validazione degli anni di esperienza
-    if (year <= 0 || isNaN(year)) {
-      setError("Gli anni di esperienza devono essere maggiori di 0 e un numero valido.");
-      return;
-    }
-
-    // Se tutto è valido, inviamo il form
-    console.log({name, userName, password, specializzazione, year, description});
+    console.log({ name, userName, password, specializzazione, year, description });
   }
 
   return (
@@ -36,34 +58,33 @@ function App() {
       <h1>hello world</h1>
       <div>
         <form onSubmit={handleSubmit}>
-          <input 
-            type="text" 
-            placeholder="inserisci nome" 
+          <input
+            type="text"
+            placeholder="inserisci nome"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
-          <input 
-            type="text" 
-            placeholder="inserisci username" 
-            required
+          <input
+            type="text"
+            placeholder="inserisci username"
             value={userName}
-            onChange={(e) => setUserName(e.target.value)}
+            onChange={handleUserNameChange}
           />
+          {userNameError && <p style={{ color: "red" }}>{userNameError}</p>}
 
-          <input 
-            type="password" 
-            placeholder="inserisci password" 
-            required
+          <input
+            type="password"
+            placeholder="inserisci password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
           />
+          {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
 
           <select
             value={specializzazione}
             onChange={(e) => setSpecializzazione(e.target.value)}
-            required
           >
             <option value="">Scegli specializzazione</option>
             <option value="Full Stack">Full Stack</option>
@@ -76,19 +97,18 @@ function App() {
             placeholder="inserisci anni di esperienza"
             required
             value={year}
-            onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")}
+            onChange={(e) => setYear(e.target.value)}
           />
 
           <textarea
             placeholder="inserisci breve descrizione"
-            required
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={handleDescriptionChange}
           />
-          <button type="submit">Invia</button>
-        </form>
+          {descriptionError && <p style={{ color: "red" }}>{descriptionError}</p>}
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+          <button type="submit">invia</button>
+        </form>
       </div>
     </>
   );
